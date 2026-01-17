@@ -53,6 +53,8 @@ class ContentsController < ApplicationController
   params.require(:content).permit(
     :content_ar,
     :content_en,
+    :blog_id,
+    :user_id,
     :is_published,
     content_photos_attributes: [
       :id,
