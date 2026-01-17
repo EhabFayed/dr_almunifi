@@ -5,43 +5,72 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: dr_elmunify_development
+      POSTGRES_DB: app_production
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7
     restart: always
-    ports:
-      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   app:
     build: .
+    image: myapp_image:latest
     restart: always
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
-      DATABASE_URL: postgres://postgres:password@db:5432/dr_elmunify_development
-      REDIS_URL: redis://redis:6379/0
+       RAILS_ENV: production
+       DATABASE_URL: postgres://postgres:password@db:5432/app_production
+       REDIS_URL: redis://redis:6379/0
+       RAILS_LOG_TO_STDOUT: "true"
+       RAILS_SERVE_STATIC_FILES: "true"
+       RAILS_HOST: backend.almunifi.com
+       RAILS_PROTOCOL: https
+       RAILS_ASSUME_SSL: "false"
+       RAILS_FORCE_SSL: "false"
+       PORT: "9002"
+       SECRET_KEY_BASE: 742862ba43ab89c49df0f87be16c14d465e0c628e1c36fb0146d828094b4038d9e79b6d33c1601c2224f2ab5f2301d012b2064a473ebec743be5e04c4d1bed5c
+
     volumes:
-      - .:/app
       - storage:/app/storage
     ports:
-      - "3000:3000"
-    command: ["bin/rails", "server", "-b", "0.0.0.0"]
+     - "9002:9002"  # Map host port 9001 to container port 9001
+    command: ["bash", "-c", "rm -f tmp/pids/server.pid && bin/rails server -b 0.0.0.0 -p ${PORT:-9002}"]
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -f http://localhost:${PORT:-9002}/up || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
   sidekiq:
-    build: .
+    image: myapp_image:latest
     restart: always
     depends_on:
-      - redis
-      - db
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
-      DATABASE_URL: postgres://postgres:password@db:5432/dr_elmunify_development
+      RAILS_ENV: production
+      DATABASE_URL: postgres://postgres:password@db:5432/app_production
       REDIS_URL: redis://redis:6379/0
+      SECRET_KEY_BASE: 742862ba43ab89c49df0f87be16c14d465e0c628e1c36fb0146d828094b4038d9e79b6d33c1601c2224f2ab5f2301d012b2064a473ebec743be5e04c4d1bed5c
+
     volumes:
       - storage:/app/storage
     command: ["bundle", "exec", "sidekiq"]
