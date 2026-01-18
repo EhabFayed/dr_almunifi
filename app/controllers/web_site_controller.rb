@@ -135,7 +135,7 @@ skip_before_action :authorize_request
   end
 
   def faq_about_us
-    faqs = Faq.where(is_deleted: false, is_published: true, blog_id: nil).order(:id)
+    faqs = Faq.where(is_deleted: false, is_published: true, parentable_id: nil).order(:id)
 
     render json: faqs.map { |faq|
       {
