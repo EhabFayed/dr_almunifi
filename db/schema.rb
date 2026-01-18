@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_17_155003) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_18_134616) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -78,13 +78,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_17_155003) do
   create_table "contents", force: :cascade do |t|
     t.text "content_ar"
     t.text "content_en"
-    t.integer "blog_id"
+    t.string "parentable_type"
+    t.bigint "parentable_id"
     t.integer "user_id"
     t.boolean "is_deleted", default: false
     t.boolean "is_published", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["blog_id"], name: "index_contents_on_blog_id"
+    t.index ["parentable_type", "parentable_id"], name: "index_contents_on_parentable"
   end
 
   create_table "faqs", force: :cascade do |t|
@@ -92,13 +93,38 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_17_155003) do
     t.string "question_en"
     t.text "answer_ar"
     t.text "answer_en"
-    t.integer "blog_id"
+    t.string "parentable_type"
+    t.bigint "parentable_id"
     t.boolean "is_deleted", default: false
     t.boolean "is_published", default: false
     t.integer "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["blog_id"], name: "index_faqs_on_blog_id"
+    t.index ["parentable_type", "parentable_id"], name: "index_faqs_on_parentable"
+  end
+
+  create_table "operations", force: :cascade do |t|
+    t.string "photo"
+    t.string "title_ar"
+    t.string "title_en"
+    t.string "description_ar"
+    t.string "description_en"
+    t.string "image_alt_text_ar"
+    t.string "image_alt_text_en"
+    t.string "meta_title_ar"
+    t.string "meta_title_en"
+    t.string "slug"
+    t.string "slug_ar"
+    t.text "meta_description_ar"
+    t.text "meta_description_en"
+    t.boolean "is_published", default: false
+    t.boolean "is_deleted", default: false
+    t.integer "category"
+    t.integer "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_operations_on_slug", unique: true
+    t.index ["slug_ar"], name: "index_operations_on_slug_ar", unique: true
   end
 
   create_table "users", force: :cascade do |t|
