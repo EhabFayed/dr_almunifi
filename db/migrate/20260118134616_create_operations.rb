@@ -1,7 +1,7 @@
 class CreateOperations < ActiveRecord::Migration[8.0]
   def change
     create_table :operations do |t|
-     t.string :photo
+     t.string :photo_id
       t.string :title_ar
       t.string :title_en
       t.string :description_ar
