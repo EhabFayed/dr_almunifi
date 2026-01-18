@@ -11,9 +11,16 @@ Rails.application.routes.draw do
     resources :faqs, only: [:index, :create, :update, :destroy]
     resources :contents, only: [:index, :create, :update, :destroy]
   end
+
+  resources :operations, only: [:index, :create, :update, :destroy] do
+    resources :faqs, only: [:index, :create, :update, :destroy]
+    resources :contents, only: [:index, :create, :update, :destroy]
+  end
   get "up" => "rails/health#show", as: :rails_health_check
   get "blogs_landing", to: "web_site#blogs_landing"
   get "blog_show/", to: "web_site#blog_show"
+  get "operations_landing", to: "web_site#operations_landing"
+  get "operation_show/", to: "web_site#operation_show"
   get '/faq_about_us', to: 'web_site#faq_about_us'
   get '/faqs', to: 'faqs#index_without_blog'
   post '/faqs', to: 'faqs#create_without_blog'

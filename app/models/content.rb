@@ -1,7 +1,7 @@
 class Content < ApplicationRecord
   validates :content_ar, :content_en, presence: true
 
-  belongs_to :blog
+  belongs_to :parentable, polymorphic: true
   belongs_to :user
 
   has_many :content_photos, dependent: :destroy

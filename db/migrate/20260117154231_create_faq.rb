@@ -5,12 +5,11 @@ class CreateFaq < ActiveRecord::Migration[8.0]
       t.string :question_en
       t.text :answer_ar
       t.text :answer_en
-      t.integer :blog_id
+      t.references :parentable, polymorphic: true, index: true
       t.boolean :is_deleted , default: false
       t.boolean :is_published, default: false
       t.integer :user_id
       t.timestamps
     end
-    add_index :faqs, :blog_id
   end
 end

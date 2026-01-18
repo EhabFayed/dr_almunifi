@@ -1,8 +1,9 @@
 class ContentsController < ApplicationController
   # GET /blog/:blog_id/contents
+  # GET /operations/:operation_id/contents
   def index
-    blog = Blog.find(params[:blog_id])
-    contents = blog.contents.where(is_deleted: false).order(:id).map do |content|
+    parent = find_parent
+    contents = parent.contents.where(is_deleted: false).order(:id).map do |content|
       {
         id: content.id,
         content_ar: content.content_ar,
@@ -21,9 +22,10 @@ class ContentsController < ApplicationController
   end
 
   # POST /blog/:blog_id/contents
+  # POST /operations/:operation_id/contents
   def create
-    blog = Blog.find(params[:blog_id])
-    content = blog.contents.build(content_params)
+    parent = find_parent
+    content = parent.contents.build(content_params)
     content.user_id = current_user.id
     if content.save
       render json: {message: 'Content created successfully'}, status: :created
@@ -49,11 +51,19 @@ class ContentsController < ApplicationController
   end
 
   private
+
+  def find_parent
+    if params[:blog_id]
+      Blog.find(params[:blog_id])
+    elsif params[:operation_id]
+      Operation.find(params[:operation_id])
+    end
+  end
+
   def content_params
   params.require(:content).permit(
     :content_ar,
     :content_en,
-    :blog_id,
     :user_id,
     :is_published,
     content_photos_attributes: [

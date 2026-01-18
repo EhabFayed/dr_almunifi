@@ -18,6 +18,70 @@ skip_before_action :authorize_request
     end
     render json: blogs
   end
+  def operations_landing
+    operations= Operation.published.map do |operation|
+      {
+        id: operation.id,
+        title_ar: operation.title_ar,
+        title_en: operation.title_en,
+        category: operation.category,
+        slug: operation.slug,
+        slug_ar: operation.slug_ar,
+        photo_url: operation.photo.attached? ? url_for(operation.photo) : nil,
+        image_alt_text_ar: operation.image_alt_text_ar,
+        image_alt_text_en: operation.image_alt_text_en,
+      }
+    end
+    render json: operations
+  end
+
+  def operation_show
+    operation = Operation.find_by_any_slug(params[:slug])
+    if operation
+      data = {
+            id: operation.id,
+            title_ar: operation.title_ar,
+            title_en: operation.title_en,
+            category: operation.category,
+            slug: operation.slug,
+            slug_ar: operation.slug_ar,
+            photo_url: operation.photo.attached? ? url_for(operation.photo) : nil,
+            meta_description_ar: operation.meta_description_ar,
+            meta_description_en: operation.meta_description_en,
+            image_alt_text_ar: operation.image_alt_text_ar,
+            image_alt_text_en: operation.image_alt_text_en,
+            meta_title_ar: operation.meta_title_ar,
+            meta_title_en: operation.meta_title_en,
+            contents: operation.contents.where(is_deleted: false, is_published: true).order(:id).map do |content|
+              {
+                id: content.id,
+                content_ar: content.content_ar,
+                content_en: content.content_en,
+                photos: content.content_photos.map do |cp|
+                  {
+                    url: cp.photo.attached? ? url_for(cp.photo) : nil,
+                    alt_ar: cp.alt_ar,
+                    alt_en: cp.alt_en
+                  }
+                end
+              }
+            end,
+            faqs: operation.faqs.where(is_deleted: false, is_published: true).order(:id).map do |faq|
+              {
+                id: faq.id,
+                question_ar: faq.question_ar,
+                question_en: faq.question_en,
+                answer_ar: faq.answer_ar,
+                answer_en: faq.answer_en,
+              }
+            end
+          }
+
+      render json: data
+    else
+      render json: { error: 'Operation not found' }, status: :not_found
+    end
+  end
   def blog_show
     blog = Blog.find_by_any_slug(params[:slug])
     if blog

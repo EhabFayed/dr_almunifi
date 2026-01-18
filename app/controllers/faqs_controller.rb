@@ -2,9 +2,10 @@ class FaqsController < ApplicationController
 
 
   # GET /blog/:blog_id/faqs
+  # GET /operations/:operation_id/faqs
   def index
-    blog = Blog.find(params[:blog_id])
-    faqs = blog.faqs.where(is_deleted: false).order(:id).map do |faq|
+    parent = find_parent
+    faqs = parent.faqs.where(is_deleted: false).order(:id).map do |faq|
       {
         id: faq.id,
         question_ar: faq.question_ar,
@@ -18,10 +19,11 @@ class FaqsController < ApplicationController
   end
 
   # POST /blog/:blog_id/faqs
+  # POST /operations/:operation_id/faqs
   def create
-    blog = Blog.find(params[:blog_id])
+    parent = find_parent
 
-    faq = blog.faqs.build(faq_params)
+    faq = parent.faqs.build(faq_params)
     faq.user_id = current_user.id
     if faq.save
       render json: {message: 'Faq created successfully'}, status: :created
@@ -43,7 +45,7 @@ class FaqsController < ApplicationController
   end
   # GET /faqs
   def index_without_blog
-    faqs = Faq.where(is_deleted: false, blog_id: nil).order(:id).map do |faq|
+    faqs = Faq.where(is_deleted: false, parentable_id: nil).order(:id).map do |faq|
       {
         id: faq.id,
         question_ar: faq.question_ar,
@@ -88,6 +90,14 @@ class FaqsController < ApplicationController
   end
 
   private
+
+  def find_parent
+    if params[:blog_id]
+      Blog.find(params[:blog_id])
+    elsif params[:operation_id]
+      Operation.find(params[:operation_id])
+    end
+  end
 
   def faq_params
     params.require(:faq).permit(:question_ar, :question_en, :answer_ar, :answer_en, :is_published)
