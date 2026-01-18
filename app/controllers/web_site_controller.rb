@@ -31,7 +31,7 @@ skip_before_action :authorize_request
         category: operation.category,
         slug: operation.slug,
         slug_ar: operation.slug_ar,
-        photo_url: operation.photo.attached? ? url_for(operation.photo) : nil,
+        photo_url: operation.photo_id.attached? ? url_for(operation.photo_id) : nil,
         image_alt_text_ar: operation.image_alt_text_ar,
         image_alt_text_en: operation.image_alt_text_en,
       }
@@ -49,7 +49,7 @@ skip_before_action :authorize_request
             category: operation.category,
             slug: operation.slug,
             slug_ar: operation.slug_ar,
-            photo_url: operation.photo.attached? ? url_for(operation.photo) : nil,
+            photo_url: operation.photo_id.attached? ? url_for(operation.photo_id) : nil,
             meta_description_ar: operation.meta_description_ar,
             meta_description_en: operation.meta_description_en,
             image_alt_text_ar: operation.image_alt_text_ar,

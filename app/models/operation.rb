@@ -16,7 +16,7 @@ class Operation < ApplicationRecord
 
   has_many :faqs, as: :parentable, dependent: :destroy
   has_many :contents, as: :parentable, dependent: :destroy
-  has_one_attached :photo, dependent: :destroy
+  has_one_attached :photo_id, dependent: :destroy
 
   def self.find_by_any_slug(slug)
     find_by("slug = :s OR slug_ar = :s", s: slug)

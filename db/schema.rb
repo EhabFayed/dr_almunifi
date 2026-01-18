@@ -104,7 +104,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_18_134616) do
   end
 
   create_table "operations", force: :cascade do |t|
-    t.string "photo"
+    t.string "photo_id"
     t.string "title_ar"
     t.string "title_en"
     t.string "description_ar"
