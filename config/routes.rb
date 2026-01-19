@@ -12,7 +12,7 @@ Rails.application.routes.draw do
     resources :contents, only: [:index, :create, :update, :destroy]
   end
 
-  resources :operations, only: [:index, :create, :update, :destroy] do
+  resources :operations, only: [:index,:show, :create, :update, :destroy] do
     resources :faqs, only: [:index, :create, :update, :destroy]
     resources :contents, only: [:index, :create, :update, :destroy]
   end
