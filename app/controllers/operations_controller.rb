@@ -11,7 +11,7 @@ class OperationsController < ApplicationController
         category: operation.category,
         slug: operation.slug,
         slug_ar: operation.slug_ar,
-        photo_url: operation.photo_id.attached? ? url_for(operation.photo_id) : nil,
+        photo_url: operation.photo.attached? ? url_for(operation.photo) : nil,
         meta_description_ar: operation.meta_description_ar,
         meta_description_en:  operation.meta_description_en,
         image_alt_text_ar: operation.image_alt_text_ar,
@@ -115,7 +115,7 @@ class OperationsController < ApplicationController
       :meta_description_en,
       :category,
       :is_published,
-      :photo_id,
+      :photo,
       :slug_ar
     )
   end
