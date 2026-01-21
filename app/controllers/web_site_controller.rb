@@ -36,9 +36,15 @@ skip_before_action :authorize_request
         category: operation.category,
         slug: operation.slug,
         slug_ar: operation.slug_ar,
-        photo_url: operation.photo.attached? ? url_for(operation.photo) : nil,
-        image_alt_text_ar: operation.image_alt_text_ar,
-        image_alt_text_en: operation.image_alt_text_en,
+        photos: operation.operation_photos.where(is_landing: true).map do |photo|
+          {
+            id: photo.id,
+            url: photo.photo.attached? ? url_for(photo.photo) : nil,
+            alt_ar: photo.alt_ar,
+            alt_en: photo.alt_en,
+            is_landing: photo.is_landing
+          }
+        end
       }
     end
     render json: operations
@@ -54,13 +60,19 @@ skip_before_action :authorize_request
             category: operation.category,
             slug: operation.slug,
             slug_ar: operation.slug_ar,
-            photo_url: operation.photo.attached? ? url_for(operation.photo) : nil,
             meta_description_ar: operation.meta_description_ar,
             meta_description_en: operation.meta_description_en,
-            image_alt_text_ar: operation.image_alt_text_ar,
-            image_alt_text_en: operation.image_alt_text_en,
             meta_title_ar: operation.meta_title_ar,
             meta_title_en: operation.meta_title_en,
+            photos: operation.operation_photos.where(is_landing: false).map do |photo|
+              {
+                id: photo.id,
+                url: photo.photo.attached? ? url_for(photo.photo) : nil,
+                alt_ar: photo.alt_ar,
+                alt_en: photo.alt_en,
+                is_landing: photo.is_landing
+              }
+            end,
             contents: operation.contents.where(is_deleted: false, is_published: true).order(:id).map do |content|
               {
                 id: content.id,

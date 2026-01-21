@@ -11,14 +11,20 @@ class OperationsController < ApplicationController
         category: operation.category,
         slug: operation.slug,
         slug_ar: operation.slug_ar,
-        photo_url: operation.photo.attached? ? url_for(operation.photo) : nil,
         meta_description_ar: operation.meta_description_ar,
         meta_description_en:  operation.meta_description_en,
-        image_alt_text_ar: operation.image_alt_text_ar,
-        image_alt_text_en: operation.image_alt_text_en,
         meta_title_ar: operation.meta_title_ar,
         meta_title_en: operation.meta_title_en,
-        is_published: operation.is_published
+        is_published: operation.is_published,
+        photos: operation.operation_photos.map do |ph|
+          {
+            id: ph.id,
+            photo_url: ph.photo.attached? ? url_for(ph.photo) : nil,
+            alt_ar: ph.alt_ar,
+            alt_en: ph.alt_en,
+            is_landing: ph.is_landing
+          }
+        end
       }
     end
 
@@ -35,14 +41,20 @@ class OperationsController < ApplicationController
       category: operation.category,
       slug: operation.slug,
       slug_ar: operation.slug_ar,
-      photo_url: operation.photo.attached? ? url_for(operation.photo) : nil,
       meta_description_ar: operation.meta_description_ar,
       meta_description_en:  operation.meta_description_en,
-      image_alt_text_ar: operation.image_alt_text_ar,
-      image_alt_text_en: operation.image_alt_text_en,
       meta_title_ar: operation.meta_title_ar,
       meta_title_en: operation.meta_title_en,
       is_published: operation.is_published,
+      photos: operation.operation_photos.map do |photo|
+        {
+          id: photo.id,
+          photo_url: photo.photo.attached? ? url_for(photo.photo) : nil,
+          alt_ar: photo.alt_ar,
+          alt_en: photo.alt_en,
+          is_landing: photo.is_landing
+        }
+      end,
       contents: operation.contents.map do |content|
         {
           id: content.id,
@@ -104,8 +116,6 @@ class OperationsController < ApplicationController
     params.require(:operation).permit(
       :title_ar,
       :title_en,
-      :image_alt_text_ar,
-      :image_alt_text_en,
       :description_ar,
       :description_en,
       :meta_title_ar,
@@ -115,8 +125,15 @@ class OperationsController < ApplicationController
       :meta_description_en,
       :category,
       :is_published,
-      :photo,
-      :slug_ar
+      :slug_ar,
+      operation_photos_attributes: [
+        :id,
+        :alt_ar,
+        :alt_en,
+        :photo,
+        :is_landing,
+        :_destroy
+      ]
     )
   end
 end

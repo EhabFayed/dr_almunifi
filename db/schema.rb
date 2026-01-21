@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_21_214007) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_21_223324) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -113,6 +113,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_21_214007) do
     t.index ["parentable_type", "parentable_id"], name: "index_faqs_on_parentable"
   end
 
+  create_table "operation_photos", force: :cascade do |t|
+    t.bigint "operation_id", null: false
+    t.string "alt_ar"
+    t.string "alt_en"
+    t.boolean "is_landing"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["operation_id"], name: "index_operation_photos_on_operation_id"
+  end
+
   create_table "operations", force: :cascade do |t|
     t.string "photo"
     t.string "title_ar"
@@ -151,4 +161,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_21_214007) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "blog_photos", "blogs"
   add_foreign_key "content_photos", "contents"
+  add_foreign_key "operation_photos", "operations"
 end
