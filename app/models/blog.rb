@@ -4,6 +4,7 @@ class Blog < ApplicationRecord
   validates :title_ar, :title_en, presence: true
   validates :slug, presence: true, uniqueness: true
   validates :slug_ar, uniqueness: true, presence: true
+  validates :blog_photos, length: { maximum: 2, message: "can have at most 2 photos" }
 
 
   enumerize :category, in: {
@@ -20,7 +21,9 @@ class Blog < ApplicationRecord
 
   has_many :faqs, as: :parentable, dependent: :destroy
   has_many :contents, as: :parentable, dependent: :destroy
-  has_one_attached :photo_id, dependent: :destroy
+  has_many :blog_photos, dependent: :destroy
+  accepts_nested_attributes_for :blog_photos, allow_destroy: true, reject_if: :all_blank
+
 
 
   # app/models/blog.rb

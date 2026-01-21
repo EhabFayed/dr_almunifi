@@ -12,14 +12,19 @@ class BlogsController < ApplicationController
         category: blog.category,
         slug: blog.slug,
         slug_ar: blog.slug_ar,
-        photo_url: blog.photo_id.attached? ? url_for(blog.photo_id) : nil,
         meta_description_ar: blog.meta_description_ar,
         meta_description_en: blog.meta_description_en,
-        image_alt_text_ar: blog.image_alt_text_ar,
-        image_alt_text_en: blog.image_alt_text_en,
         meta_title_ar: blog.meta_title_ar,
         meta_title_en: blog.meta_title_en,
-        is_published: blog.is_published
+        is_published: blog.is_published,
+        photos: blog.blog_photos.map do |photo|
+          {
+            id: photo.id,
+            url: photo.photo.attached? ? url_for(photo.photo) : nil,
+            alt: photo.is_arabic ? photo.alt_ar : photo.alt_en,
+            is_arabic: photo.is_arabic
+          }
+        end
       }
     end
 
@@ -36,14 +41,19 @@ class BlogsController < ApplicationController
           category: blog.category,
           slug: blog.slug,
           slug_ar: blog.slug_ar,
-          photo_url: blog.photo_id.attached? ? url_for(blog.photo_id) : nil,
           meta_description_ar: blog.meta_description_ar,
           meta_description_en: blog.meta_description_en,
-          image_alt_text_ar: blog.image_alt_text_ar,
-          image_alt_text_en: blog.image_alt_text_en,
           meta_title_ar: blog.meta_title_ar,
           meta_title_en: blog.meta_title_en,
           is_published: blog.is_published,
+          photos: blog.blog_photos.map do |photo|
+            {
+              id: photo.id,
+              url: photo.photo.attached? ? url_for(photo.photo) : nil,
+              alt: photo.is_arabic ? photo.alt_ar : photo.alt_en,
+              is_arabic: photo.is_arabic
+            }
+          end,
           contents: blog.contents.where(is_deleted: false).order(:id).map do |content|
             {
               id: content.id,
@@ -109,8 +119,6 @@ class BlogsController < ApplicationController
     params.require(:blog).permit(
       :title_ar,
       :title_en,
-      :image_alt_text_ar,
-      :image_alt_text_en,
       :description_ar,
       :description_en,
       :meta_title_ar,
@@ -120,8 +128,15 @@ class BlogsController < ApplicationController
       :meta_description_en,
       :category,
       :is_published,
-      :photo_id,
-      :slug_ar
+      :slug_ar,
+      blog_photos_attributes: [
+        :id,
+        :alt_ar,
+        :alt_en,
+        :photo,
+        :is_arabic,
+        :_destroy
+      ]
     )
   end
 end
