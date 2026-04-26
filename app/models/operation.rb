@@ -11,8 +11,8 @@ class Operation < ApplicationRecord
       digital_marketing: 4,
       e_commerce: 5
     }
-  scope :not_deleted, -> { where(is_deleted: false) }
-  scope :published, -> { where(is_deleted: false, is_published: true) }
+  scope :not_deleted, -> { where(is_deleted: false).order(created_at: :desc) }
+  scope :published, -> { where(is_deleted: false, is_published: true).order(created_at: :desc) }
 
   has_many :faqs, as: :parentable, dependent: :destroy
   has_many :contents, as: :parentable, dependent: :destroy
